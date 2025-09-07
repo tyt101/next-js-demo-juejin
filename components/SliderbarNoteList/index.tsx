@@ -1,8 +1,13 @@
-import dayjs from "dayjs"
-export default async function SidebarNoteList({ notes }: { notes: Record<string, any> }) {
-	const arr = Object.entries(notes)
-	console.log('===arrr:', arr)
+import { getAllNotes } from "@/lib/redis";
+import SidebarNoteItem from "../SidebarNoteItem"
+export default async function SidebarNoteList() {
 
+	const sleep = (ms: number) => new Promise(r => setTimeout(r, ms));
+	await sleep(3000);
+
+
+	const notes = await getAllNotes()
+	const arr = Object.entries(notes)
 	if (arr.length === 0) {
 		return <div className="notes-empty">
 			{'No notes created yet!'}
@@ -11,12 +16,8 @@ export default async function SidebarNoteList({ notes }: { notes: Record<string,
 	return (
 		<ul className="notes-list">
 			{arr.map(([noteId, note]) => {
-				const { title, updateTime } = JSON.parse(note);
 				return <li key={noteId}>
-					<header className="sidebar-note-header">
-						<strong>{title}</strong>
-						<small>{dayjs(updateTime).format('YYYY-MM-DD hh:mm:ss')}</small>
-					</header>
+					<SidebarNoteItem noteId={noteId} note={JSON.parse(note)} />
 				</li>
 			})}
 		</ul>
